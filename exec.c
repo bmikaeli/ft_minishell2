@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh2.h"
 
-int					isexistinpath(char *bin, t_sh1 *all)
+int					isexistinpath(char *bin, t_sh2 *all)
 {
 	int				i;
 	int				len;
@@ -40,7 +40,7 @@ int					isexistinpath(char *bin, t_sh1 *all)
 	return (-1);
 }
 
-int					isexist(char *bin, t_sh1 *all)
+int					isexist(char *bin, t_sh2 *all)
 {
 	int				i;
 	DIR				*dirp;
@@ -69,7 +69,7 @@ int					isexist(char *bin, t_sh1 *all)
 	return (isexistinpath(bin, all));
 }
 
-void				exec(char **split, t_sh1 *all, int pathnb)
+void				exec(char **split, t_sh2 *all, int pathnb)
 {
 	int				child_status;
 	pid_t			pid;
@@ -91,7 +91,7 @@ void				exec(char **split, t_sh1 *all, int pathnb)
 		}
 }
 
-void				do_cd(char *line, t_sh1 *all)
+void				do_cd(char *line, t_sh2 *all)
 {
 	char			**split;
 	DIR				*dirp;

@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh2.h"
 
-void	print_env(t_sh1 *env)
+void	print_env(t_sh2 *env)
 {
 	int	i;
 
@@ -28,7 +28,7 @@ void	print_env(t_sh1 *env)
 	}
 }
 
-void	getpath(t_sh1 *env)
+void	getpath(t_sh2 *env)
 {
 	int	i;
 
@@ -41,7 +41,7 @@ void	getpath(t_sh1 *env)
 	}
 }
 
-int		ft_unsetenv(char *todelete, t_sh1 *all)
+int		ft_unsetenv(char *todelete, t_sh2 *all)
 {
 	int	i;
 	int	found;
@@ -63,7 +63,7 @@ int		ft_unsetenv(char *todelete, t_sh1 *all)
 	return (0);
 }
 
-int		ft_setenv(char *toadd, t_sh1 *all)
+int		ft_setenv(char *toadd, t_sh2 *all)
 {
 	char	**split;
 	char	**split2;

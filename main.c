@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh2.h"
 
-void		parse2(char *line, t_sh1 *all)
+void		parse2(char *line, t_sh2 *all)
 {
 	char	**split;
 	int		pathnb;
@@ -38,7 +38,7 @@ void		parse2(char *line, t_sh1 *all)
 	}
 }
 
-void		parse(char *line, t_sh1 *all)
+void		parse(char *line, t_sh2 *all)
 {
 	char	**allcmd;
 	int		i;
@@ -58,10 +58,15 @@ char		*trimline(char *line)
 	int		i;
 	int		j;
 
-	ret = malloc(sizeof(char *) * ft_strlen(line));
+
+	if(ft_strlen(line))
+		ret = malloc(sizeof(char *) * ft_strlen(line) + 1);
+	else
+		ret = malloc(500);
+
 	i = 0;
 	j = 0;
-	while (line[i] && line[i] != '\0')
+	while (line && line[i])
 	{
 		if ((line[i] == ' ' || line[i] == '\t') && ret[j - 1] == ' ')
 		{
@@ -82,7 +87,7 @@ char		*trimline(char *line)
 int			main(int ac, char **av, char **env)
 {
 	char	*line;
-	t_sh1	all;
+	t_sh2	all;
 
 	(void)ac;
 	(void)av;
@@ -98,8 +103,12 @@ int			main(int ac, char **av, char **env)
 	ft_putstr("bmikaeli $> ");
 	while (get_next_line(1, &line))
 	{
-		line = trimline(ft_strtrim(line));
-		parse(line, &all);
+		line = ft_strtrim(line);
+		line = trimline(line);
+		if(ft_strcmp(line, ""))
+		{
+			parse(line, &all);
+		}
 		ft_putstr("bmikaeli $> ");
 	}
 	return (0);
