@@ -14,6 +14,7 @@
 # define FT_SH2_H
 
 # include <unistd.h>
+# include <fcntl.h>
 # include <stdio.h>
 # include "libft/includes/libft.h"
 # include <dirent.h>
