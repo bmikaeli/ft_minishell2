@@ -34,6 +34,8 @@ int				ft_setenv(char *toadd, t_sh2 *all);
 
 void			exec(char **split, t_sh2 *all, int pathnb);
 
+void			execpipe(char **split, char ** split2, t_sh2 *all, int pathnb, int pathnb2);
+
 void			do_cd(char *line, t_sh2 *all);
 
 void			print_env(t_sh2 *all);

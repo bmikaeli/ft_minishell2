@@ -12,55 +12,49 @@
 
 #include "ft_sh2.h"
 
-void		parse2(char *line, t_sh2 *all)
+void		parse2(char *line, t_sh2 *all, int pipe)
 {
 	char	**split;
 	int		pathnb;
+	int		pathnb2;
 
-	if (!ft_strcmp(line, "exit"))
-		exit(1);
-	else if (!ft_strncmp(line, "cd ", 3))
-		do_cd(line, all);
-	else if (!ft_strncmp(line, "setenv ", 7))
-		ft_setenv(line, all);
-	else if (!ft_strcmp(line, "env"))
-		print_env(all);
-	else if (!ft_strncmp(line, "unsetenv ", 9))
-		ft_unsetenv(ft_strsplit(line, ' ')[1], all);
-	else if (ft_strcmp(line, ""))
-	{
-		split = ft_strsplit(line, ' ');
-		pathnb = isexist(split[0], all);
-		if (pathnb != -1)
-			exec(split, all, pathnb);
-		else
-			ft_putendl("command not found");
-	}
+    if (pipe == 1)
+    {
+        split = ft_strsplit(line, '|');
+        pathnb = isexist(ft_strsplit(split[0], ' ')[0], all);
+        pathnb2 = isexist(ft_strsplit(split[1], ' ')[0], all);
+        if (pathnb != -1 && pathnb2 != -1)
+        {
+            char ** splitfirst = ft_strsplit(split[0], ' ');
+            char ** splitsecond = ft_strsplit(split[1], ' ');
+            execpipe(splitfirst, splitsecond, all, pathnb, pathnb2);
+        }
+        else
+            ft_putendl("command not found");
+    }
+    else
+    {
+        if (!ft_strcmp(line, "exit"))
+            exit(1);
+        else if (!ft_strncmp(line, "cd ", 3))
+            do_cd(line, all);
+        else if (!ft_strncmp(line, "setenv ", 7))
+            ft_setenv(line, all);
+        else if (!ft_strcmp(line, "env"))
+            print_env(all);
+        else if (!ft_strncmp(line, "unsetenv ", 9))
+            ft_unsetenv(ft_strsplit(line, ' ')[1], all);
+        else if (ft_strcmp(line, ""))
+        {
+            split = ft_strsplit(line, ' ');
+            pathnb = isexist(split[0], all);
+            if (pathnb != -1)
+                exec(split, all, pathnb);
+            else
+                ft_putendl("command not found");
+        }
+    }
 }
-
-
-/* Read characters from the pipe and echo them to stdout. */
-void read_from_pipe (int file)
-{
-    FILE *stream;
-    int c;
-    stream = fdopen (file, "r");
-    while ((c = fgetc (stream)) != EOF)
-        putchar (c);
-    fclose (stream);
-}
-
-/* Write some random text to the pipe. */
-
-void write_to_pipe (int file)
-{
-    FILE *stream;
-    stream = fdopen (file, "w");
-    fprintf (stream, "hello, world!\n");
-    fprintf (stream, "goodbye, world!\n");
-    fclose (stream);
-}
-
 
 void		parse(char *line, t_sh2 *all)
 {
@@ -73,31 +67,7 @@ void		parse(char *line, t_sh2 *all)
 	{
         if(ft_strstr(allcmd[i] , "|") != NULL)
         {
-            char **split = ft_strsplit(allcmd[i], '|');
-
-            int fds[2];
-            pid_t pid;
-            pipe(fds);
-
-            /* Create the child process. */
-            pid = fork ();
-            if (pid == (pid_t) 0)
-            {
-                /* This is the child process.
-                   Close other end first. */
-                close (fds[1]);
-//                parse2(split[1], all);
-                read_from_pipe (fds[0]);
-            }
-            else
-            {
-                /* This is the parent process.
-                   Close other end first. */
-                close (fds[0]);
-
-                parse2(split[0], all);
-//                write_to_pipe(fds[1]);
-            }
+            parse2(allcmd[i], all, 1);
         }
 		else if(ft_strstr(allcmd[i], ">>") != NULL)
 		{
@@ -108,7 +78,7 @@ void		parse(char *line, t_sh2 *all)
                 int sortie = open(ft_strtrim(split[1]), O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IROTH | S_IWOTH);
                 int old = dup(1);
                 dup2(sortie, 1);
-                parse2(split[0], all);
+                parse2(split[0], all, 0);
                 close(sortie);
                 dup2(old, 1);
             }
@@ -125,7 +95,7 @@ void		parse(char *line, t_sh2 *all)
                 int sortie = open(ft_strtrim(split[1]), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IROTH | S_IWOTH);
                 int old = dup(1);
                 dup2(sortie, 1);
-                parse2(split[0], all);
+                parse2(split[0], all, 0);
                 close(sortie);
                 dup2(old, 1);
             }
@@ -142,7 +112,7 @@ void		parse(char *line, t_sh2 *all)
                 int entree = open(ft_strtrim(split[1]), O_RDONLY);
                 int old = dup(0);
                 dup2(entree, 0);
-                parse2(split[0], all);
+                parse2(split[0], all, 0);
                 close(entree);
                 dup2(old, 0);
             }
@@ -158,13 +128,13 @@ void		parse(char *line, t_sh2 *all)
             int sortie = open(ft_strtrim(split[1]), O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IROTH | S_IWOTH);
             int old = dup(1);
             dup2(sortie, 1);
-            parse2(split[0], all);
+            parse2(split[0], all, 0);
             close(sortie);
             dup2(old, 1);
         }
 		else
 		{
-			parse2(allcmd[i], all);
+			parse2(allcmd[i], all, 0);
 		}
 		i++;
 	}
@@ -205,6 +175,7 @@ int			main(int ac, char **av, char **env)
 
     (void)ac;
 	(void)av;
+
 	if (env[0] == NULL)
 	{
 		ft_putendl("Env null");

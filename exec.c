@@ -80,8 +80,7 @@ void				exec(char **split, t_sh2 *all, int pathnb)
 		if (pathnb == 42)
 			execve(split[0], split, all->env);
 		else
-			execve(ft_strjoin(all->path[pathnb],
-				ft_strjoin("/", split[0])), split, all->env);
+			execve(ft_strjoin(all->path[pathnb], ft_strjoin("/", split[0])), split, all->env);
 		ft_putendl("error execve");
 		exit(0);
 	}
@@ -89,6 +88,26 @@ void				exec(char **split, t_sh2 *all, int pathnb)
 		while (!waitpid(pid, &child_status, WNOHANG))
 		{
 		}
+}
+
+void				execpipe(char **split, char **split2, t_sh2 *all, int pathnb, int pathnb2)
+{
+	int pfds[2];
+
+	pipe(pfds);
+
+	if (!fork()) {
+		close(1);       /* close normal stdout */
+		dup(pfds[1]);   /* make stdout same as pfds[1] */
+		close(pfds[0]); /* we don't need this */
+		execve(ft_strjoin(all->path[pathnb], ft_strjoin("/", split[0])), split, all->env);
+	}
+	else {
+		close(0);       /* close normal stdin */
+		dup(pfds[0]);   /* make stdin same as pfds[0] */
+		close(pfds[1]); /* we don't need this */
+		execve(ft_strjoin(all->path[pathnb2], ft_strjoin("/", split2[0])), split2, all->env);
+	}
 }
 
 void				do_cd(char *line, t_sh2 *all)
